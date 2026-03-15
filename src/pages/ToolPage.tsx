@@ -29,6 +29,7 @@ export default function ToolPage() {
 
   const category = categories.find((c) => c.slug === tool.category);
   const categoryName = category?.name || tool.category;
+  const pageTitle = tool.seoTitle || tool.name;
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -43,7 +44,7 @@ export default function ToolPage() {
   const toolSchema = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
-    name: tool.name,
+    name: pageTitle,
     description: tool.description,
     url: `https://yourdomain.com/tools/${tool.slug}`,
     applicationCategory: "UtilityApplication",
@@ -52,27 +53,27 @@ export default function ToolPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-    <Helmet>
-      <title>{tool.name} – ToolStack</title>
+      <Helmet>
+        <title>{pageTitle} - ToolStack</title>
 
-      <meta name="description" content={tool.description} />
+        <meta name="description" content={tool.description} />
 
-      <link rel="canonical" href={`https://tool-stack.online/tools/${tool.slug}`} />
+        <link rel="canonical" href={`https://tool-stack.online/tools/${tool.slug}`} />
 
-      <meta property="og:title" content={`${tool.name} – ToolStack`} />
-      <meta property="og:description" content={tool.description} />
-      <meta property="og:type" content="website" />
-      <meta property="og:url" content={`https://tool-stack.online/tools/${tool.slug}`} />
-      <meta property="og:image" content="https://tool-stack.online/og-image.png" />
+        <meta property="og:title" content={`${pageTitle} - ToolStack`} />
+        <meta property="og:description" content={tool.description} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://tool-stack.online/tools/${tool.slug}`} />
+        <meta property="og:image" content="https://tool-stack.online/og-image.png" />
 
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={`${tool.name} – ToolStack`} />
-      <meta name="twitter:description" content={tool.description} />
-      <meta name="twitter:image" content="https://tool-stack.online/og-image.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={`${pageTitle} - ToolStack`} />
+        <meta name="twitter:description" content={tool.description} />
+        <meta name="twitter:image" content="https://tool-stack.online/og-image.png" />
 
-      <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
-      <script type="application/ld+json">{JSON.stringify(toolSchema)}</script>
-    </Helmet>
+        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
+        <script type="application/ld+json">{JSON.stringify(toolSchema)}</script>
+      </Helmet>
 
       <Breadcrumb>
         <BreadcrumbList>

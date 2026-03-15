@@ -17,37 +17,16 @@
     <loc>https://tool-stack.online/tools/sip-calculator</loc>
   </url>
   <url>
-    <loc>https://tool-stack.online/tools/fd-calculator</loc>
-  </url>
-  <url>
     <loc>https://tool-stack.online/tools/gst-calculator</loc>
   </url>
   <url>
-    <loc>https://tool-stack.online/tools/loan-interest-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/ctc-to-inhand</loc>
+    <loc>https://tool-stack.online/tools/ctc-to-in-hand-salary-calculator</loc>
   </url>
   <url>
     <loc>https://tool-stack.online/tools/split-bill-calculator</loc>
   </url>
   <url>
     <loc>https://tool-stack.online/tools/tip-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/age-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/compound-interest-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/simple-interest-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/markup-calculator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/profit-margin-calculator</loc>
   </url>
   <url>
     <loc>https://tool-stack.online/tools/json-formatter</loc>
@@ -62,28 +41,7 @@
     <loc>https://tool-stack.online/tools/url-encoder-decoder</loc>
   </url>
   <url>
-    <loc>https://tool-stack.online/tools/jwt-decoder</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/regex-tester</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/timestamp-converter</loc>
-  </url>
-  <url>
     <loc>https://tool-stack.online/tools/uuid-generator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/slug-generator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/color-converter</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/hash-generator</loc>
-  </url>
-  <url>
-    <loc>https://tool-stack.online/tools/lorem-ipsum-generator</loc>
   </url>
   <url>
     <loc>https://tool-stack.online/tools/word-counter</loc>

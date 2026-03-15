@@ -1,7 +1,11 @@
 import { writeFileSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath } from "url";
 import { allTools } from "../src/data/tools.ts";
 
 const BASE_URL = "https://tool-stack.online";
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const sitemapPath = resolve(scriptDir, "../public/sitemap.xml");
 
 const urls = [
   `${BASE_URL}/`,
@@ -20,6 +24,6 @@ ${urls
   .join("")}
 </urlset>`;
 
-writeFileSync("./public/sitemap.xml", sitemap);
+writeFileSync(sitemapPath, sitemap);
 
-console.log("✅ sitemap.xml generated successfully");
+console.log("sitemap.xml generated successfully");
