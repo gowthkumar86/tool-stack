@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ToolConfig } from "@/data/types";
 import { runToolLogic } from "@/utils/toolLogic";
 
@@ -49,9 +49,10 @@ function formatResultValue(value: unknown) {
 
 export default function ToolEngine({ tool }: Props) {
   const { toast } = useToast();
-
-  const initialValues: Record<string, string> = Object.fromEntries(
-    tool.inputs.map((inp) => [inp.name, inp.defaultValue ?? ""])
+  const initialValues: Record<string, string> = useMemo(
+    () =>
+      Object.fromEntries(tool.inputs.map((inp) => [inp.name, inp.defaultValue ?? ""])),
+    [tool.inputs]
   );
 
   const [values, setValues] = useState<Record<string, string>>(initialValues);
@@ -69,7 +70,11 @@ export default function ToolEngine({ tool }: Props) {
     setError(null);
     setFileNames({});
     setFileInputKey((prev) => prev + 1);
-  }, [tool.slug]);
+  }, [initialValues, tool.slug]);
+
+  if (tool.renderTool) {
+    return <>{tool.renderTool()}</>;
+  }
 
   const handleChange = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
@@ -311,7 +316,7 @@ export default function ToolEngine({ tool }: Props) {
       {result && (
         <Card className="border-primary/30 bg-primary/5">
 
-          <CardContent className="pt-6 space-y-4">
+          <CardContent className="min-w-0 overflow-hidden pt-6 space-y-4">
 
             {tool.renderResult ? (
               tool.renderResult(result)
@@ -366,3 +371,4 @@ export default function ToolEngine({ tool }: Props) {
     </div>
   );
 }
+

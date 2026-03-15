@@ -8,6 +8,7 @@ import type {
 export type ToolRunner = (values: ToolValues) => ToolLogicResult;
 export type ToolResultRenderer = (result: ToolLogicResult) => ReactNode;
 export type ToolCopyTextGetter = (result: ToolLogicResult) => string;
+export type ToolRenderer = () => ReactNode;
 
 export interface ToolOption {
   label: string;
@@ -52,6 +53,7 @@ export interface ToolConfig {
   results: ToolResultField[];
   logic: ToolLogicId;
   run?: ToolRunner;
+  renderTool?: ToolRenderer;
   renderResult?: ToolResultRenderer;
   getCopyText?: ToolCopyTextGetter;
   instructions?: string[];

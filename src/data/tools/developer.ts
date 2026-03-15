@@ -1,8 +1,12 @@
 import type { ToolConfig } from "../types.ts";
 import { jsonFormatterTool } from "../../tools/json-formatter/index.ts";
+import { harAnalyzerTool } from "../../tools/har-analyzer/index.ts";
+import { htmlViewerTool } from "../../tools/html-viewer/index.ts";
 
 export const developerTools: ToolConfig[] = [
+  htmlViewerTool,
   jsonFormatterTool,
+  harAnalyzerTool,
 
   {
     name: "JSON Validator",
@@ -246,4 +250,3 @@ export const developerTools: ToolConfig[] = [
     tags: ["uuid", "generator", "developer"]
   }
 ];
-
