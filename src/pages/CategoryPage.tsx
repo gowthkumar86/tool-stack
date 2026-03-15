@@ -1,9 +1,9 @@
-import { useParams, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
+import { Link, useParams } from "react-router-dom";
+import AdPlaceholder from "@/components/AdPlaceholder";
+import PageSeo from "@/components/PageSeo";
+import ToolCard from "@/components/ToolCard";
 import { categories } from "@/data/categories";
 import { getToolsByCategory } from "@/data/tools";
-import ToolCard from "@/components/ToolCard";
-import AdPlaceholder from "@/components/AdPlaceholder";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,18 +16,67 @@ import NotFound from "./NotFound";
 
 export default function CategoryPage() {
   const { slug } = useParams<{ slug: string }>();
-  const category = categories.find((c) => c.slug === slug);
+  const category = categories.find((item) => item.slug === slug);
 
-  if (!category) return <NotFound />;
+  if (!category) {
+    return <NotFound />;
+  }
 
   const tools = getToolsByCategory(category.slug);
+  const categoryPath = `/category/${category.slug}`;
+  const categorySchemas = [
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      name: `${category.name} - ToolStack`,
+      description: category.description,
+      url: `https://tool-stack.online${categoryPath}`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Home",
+          item: "https://tool-stack.online/",
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: category.name,
+          item: `https://tool-stack.online${categoryPath}`,
+        },
+      ],
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: `${category.name} tools`,
+      itemListElement: tools.map((tool, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: tool.name,
+        url: `https://tool-stack.online/${tool.slug}`,
+      })),
+    },
+  ];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      <Helmet>
-        <title>{category.name} – ToolStack</title>
-        <meta name="description" content={category.description} />
-      </Helmet>
+    <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-6">
+      <PageSeo
+        title={`${category.name} Online Tools | ToolStack`}
+        description={`Browse free ${category.name.toLowerCase()} on ToolStack. ${category.description}`}
+        path={categoryPath}
+        keywords={[
+          category.name,
+          `${category.name.toLowerCase()} online`,
+          "free online tools",
+          "ToolStack",
+        ]}
+        schemas={categorySchemas}
+      />
 
       <Breadcrumb>
         <BreadcrumbList>
@@ -43,19 +92,39 @@ export default function CategoryPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-foreground">{category.name}</h1>
-        <p className="mt-1 text-muted-foreground">{category.description}</p>
-      </div>
+      <header className="space-y-3">
+        <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">ToolStack category</p>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">{category.name}</h1>
+        <p className="max-w-3xl leading-7 text-muted-foreground">
+          {category.description} Explore browser-based pages that are easy to use, easy to link internally, and built
+          for quick tasks on desktop or mobile.
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tools.map((tool) => (
-          <ToolCard key={tool.slug} tool={tool} />
-        ))}
-      </div>
+      <section className="space-y-4" aria-labelledby="category-benefits">
+        <h2 id="category-benefits" className="text-2xl font-semibold text-foreground">
+          What you can do with these {category.name.toLowerCase()}
+        </h2>
+        <p className="leading-7 text-muted-foreground">
+          This category brings together related ToolStack pages so you can move between similar utilities without
+          repeating the same search. Each page includes SEO-friendly descriptions, structured headings, and related
+          links to help users and search engines understand how the tools connect.
+        </p>
+      </section>
+
+      <section className="space-y-4" aria-labelledby="category-tool-list">
+        <h2 id="category-tool-list" className="text-2xl font-semibold text-foreground">
+          {category.name} available on ToolStack
+        </h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {tools.map((tool) => (
+            <ToolCard key={tool.slug} tool={tool} />
+          ))}
+        </div>
+      </section>
 
       {tools.length === 0 && (
-        <p className="text-muted-foreground text-center py-12">No tools in this category yet.</p>
+        <p className="py-12 text-center text-muted-foreground">No tools in this category yet.</p>
       )}
 
       <AdPlaceholder />

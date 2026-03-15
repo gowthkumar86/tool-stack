@@ -1,8 +1,10 @@
 import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { categories } from "@/data/categories";
 import { allTools } from "@/data/tools";
 import { Link } from "react-router-dom";
+import { getToolPath } from "@/lib/toolSeo";
 
 export default function ToolSearch() {
   const [query, setQuery] = useState("");
@@ -37,13 +39,15 @@ export default function ToolSearch() {
           {results.map((tool) => (
             <Link
               key={tool.slug}
-              to={`/tools/${tool.slug}`}
+              to={getToolPath(tool)}
               onClick={() => setQuery("")}
               className="flex items-center justify-between px-4 py-3 hover:bg-accent transition-colors border-b last:border-b-0"
             >
               <div>
                 <p className="text-sm font-medium text-foreground">{tool.name}</p>
-                <p className="text-xs text-muted-foreground">{tool.category}</p>
+                <p className="text-xs text-muted-foreground">
+                  {categories.find((category) => category.slug === tool.category)?.name ?? tool.category}
+                </p>
               </div>
             </Link>
           ))}
