@@ -9,6 +9,10 @@ import Index from "./pages/Index";
 import ToolPage from "./pages/ToolPage";
 import CategoryPage from "./pages/CategoryPage";
 import NotFound from "./pages/NotFound";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +28,10 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/tools/:slug" element={<ToolPage />} />
               <Route path="/category/:slug" element={<CategoryPage />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Layout>
