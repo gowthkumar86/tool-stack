@@ -24,24 +24,24 @@ export default function ToolSearch() {
   }, [query]);
 
   return (
-    <div className="relative w-full max-w-xl mx-auto">
+    <div className="relative w-full max-w-xl md:mx-auto">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search tools... (e.g. JSON, percentage, BMI)"
-          className="h-12 pl-10 text-base"
+          className="h-12 rounded-xl pl-10 text-base"
         />
       </div>
       {results.length > 0 && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg z-50 overflow-hidden">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border bg-popover shadow-lg">
           {results.map((tool) => (
             <Link
               key={tool.slug}
               to={getToolPath(tool)}
               onClick={() => setQuery("")}
-              className="flex items-center justify-between px-4 py-3 hover:bg-accent transition-colors border-b last:border-b-0"
+              className="flex min-h-12 items-center justify-between border-b px-4 py-3 transition-colors hover:bg-accent last:border-b-0"
             >
               <div>
                 <p className="text-sm font-medium text-foreground">{tool.name}</p>

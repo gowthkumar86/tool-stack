@@ -15,15 +15,15 @@ export default function ToolCard({ tool }: Props) {
 
   return (
     <Link to={getToolPath(tool)} aria-label={`Open ${tool.name}`}>
-      <Card className="h-full hover:shadow-md transition-shadow group cursor-pointer">
-        <CardHeader className="pb-2">
+      <Card className="group h-full cursor-pointer rounded-2xl border-border/80 transition-shadow hover:shadow-md">
+        <CardHeader className="space-y-2 pb-2">
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base font-semibold leading-tight">{tool.name}</CardTitle>
             <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-0.5" />
           </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{tool.description}</p>
+        <CardContent className="space-y-3">
+          <p className="line-clamp-3 text-sm leading-6 text-muted-foreground">{tool.description}</p>
           <Badge variant="secondary" className="text-xs">{categoryName}</Badge>
         </CardContent>
       </Card>

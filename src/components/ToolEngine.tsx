@@ -18,6 +18,7 @@ import {
 
 import { Copy, RotateCcw, Calculator } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props {
   tool: ToolConfig;
@@ -49,6 +50,7 @@ function formatResultValue(value: unknown) {
 
 export default function ToolEngine({ tool }: Props) {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const initialValues: Record<string, string> = useMemo(
     () =>
       Object.fromEntries(tool.inputs.map((inp) => [inp.name, inp.defaultValue ?? ""])),
@@ -153,14 +155,11 @@ export default function ToolEngine({ tool }: Props) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-24 md:pb-0">
 
-      {/* INPUT CARD */}
-
-      <Card>
-        <CardContent className="pt-6 space-y-4">
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Card className="overflow-hidden rounded-2xl border-border/80">
+        <CardContent className="space-y-4 p-4 md:pt-6">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
 
             {tool.inputs.map((inp) => (
               <div
@@ -175,8 +174,6 @@ export default function ToolEngine({ tool }: Props) {
                   {inp.label}
                 </Label>
 
-                {/* TEXTAREA */}
-
                 {inp.type === "textarea" && (
                   <Textarea
                     id={inp.name}
@@ -185,7 +182,7 @@ export default function ToolEngine({ tool }: Props) {
                       handleChange(inp.name, e.target.value)
                     }
                     placeholder={inp.placeholder}
-                    className="min-h-[120px]"
+                    className="min-h-[140px] resize-y md:min-h-[120px]"
                   />
                 )}
 
@@ -214,8 +211,6 @@ export default function ToolEngine({ tool }: Props) {
                   </div>
                 )}
 
-                {/* SELECT */}
-
                 {inp.type === "select" && (
                   <Select
                     value={values[inp.name]}
@@ -237,7 +232,6 @@ export default function ToolEngine({ tool }: Props) {
                   </Select>
                 )}
 
-                {/* INPUT */}
                 {inp.type !== "textarea" && inp.type !== "select" && inp.type !== "file" && (
                   <div className="relative">
 
@@ -264,8 +258,6 @@ export default function ToolEngine({ tool }: Props) {
                   </div>
                 )}
 
-                {/* HELPER TEXT */}
-
                 {inp.helperText && (
                   <p className="text-xs text-muted-foreground mt-1">
                     {inp.helperText}
@@ -275,48 +267,65 @@ export default function ToolEngine({ tool }: Props) {
             ))}
 
           </div>
+          {!isMobile && (
+            <div className="flex gap-3 pt-2">
+              <Button
+                onClick={handleCalculate}
+                className="h-12 flex-1 gap-2 text-base font-semibold"
+              >
+                <Calculator className="h-5 w-5" />
+                Calculate
+              </Button>
 
-          {/* ACTION BUTTONS */}
+              <Button
+                onClick={handleReset}
+                variant="outline"
+                className="h-12 px-4"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
 
-          <div className="flex gap-3 pt-2">
-
-            <Button
-              onClick={handleCalculate}
-              className="flex-1 h-12 text-base font-semibold gap-2"
-            >
-              <Calculator className="h-5 w-5" />
-              Calculate
-            </Button>
-
-            <Button
-              onClick={handleReset}
-              variant="outline"
-              className="h-12 px-4"
-            >
-              <RotateCcw className="h-4 w-4" />
-            </Button>
-
-          </div>
+              <Button
+                onClick={handleCopy}
+                variant="outline"
+                className="h-12 px-4"
+                disabled={!result}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
 
         </CardContent>
       </Card>
 
-      {/* ERROR */}
-
       {error && (
-        <Card className="border-destructive">
+        <Card className="rounded-2xl border-destructive">
           <CardContent className="pt-6">
             <p className="text-destructive text-sm">{error}</p>
           </CardContent>
         </Card>
       )}
 
-      {/* RESULT */}
-
       {result && (
-        <Card className="border-primary/30 bg-primary/5">
-
-          <CardContent className="min-w-0 overflow-hidden pt-6 space-y-4">
+        <Card className="rounded-2xl border-primary/30 bg-primary/5">
+          <CardContent className="min-w-0 space-y-4 overflow-hidden p-4 md:pt-6">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-semibold text-foreground">Result</h3>
+                <p className="text-sm text-muted-foreground">Updated instantly after each run.</p>
+              </div>
+              {!isMobile && (
+                <Button
+                  onClick={handleCopy}
+                  variant="outline"
+                  size="icon"
+                  className="shrink-0"
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
 
             {tool.renderResult ? (
               tool.renderResult(result)
@@ -330,43 +339,47 @@ export default function ToolEngine({ tool }: Props) {
                     {r.label}
                   </p>
 
-                  <pre className="text-lg font-semibold whitespace-pre-wrap break-all font-sans">
+                  <pre className="overflow-x-auto rounded-lg bg-background/70 p-3 font-sans text-lg font-semibold whitespace-pre-wrap break-all">
                     {formatResultValue(result[r.key])}
                   </pre>
 
                 </div>
               ))
             )}
-
-            <Button
-              onClick={handleCopy}
-              variant="outline"
-              size="icon"
-              className="mt-2"
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
-
           </CardContent>
-
         </Card>
       )}
 
-      {/* MOBILE BUTTON */}
-
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur border-t md:hidden z-50">
-
-        <Button
-          onClick={handleCalculate}
-          className="w-full h-12 text-base font-semibold gap-2"
-        >
-          <Calculator className="h-5 w-5" />
-          Calculate
-        </Button>
-
-      </div>
-
-      <div className="h-20 md:hidden" />
+      {isMobile && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 p-3 backdrop-blur">
+          <div className="mx-auto grid max-w-4xl grid-cols-3 gap-2">
+            <Button
+              onClick={handleCalculate}
+              className="h-12 gap-2 text-sm font-semibold"
+            >
+              <Calculator className="h-4 w-4" />
+              Run
+            </Button>
+            <Button
+              onClick={handleCopy}
+              variant="outline"
+              className="h-12 gap-2 text-sm"
+              disabled={!result}
+            >
+              <Copy className="h-4 w-4" />
+              Copy
+            </Button>
+            <Button
+              onClick={handleReset}
+              variant="outline"
+              className="h-12 gap-2 text-sm"
+            >
+              <RotateCcw className="h-4 w-4" />
+              Reset
+            </Button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

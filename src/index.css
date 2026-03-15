@@ -93,4 +93,27 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+
+  pre,
+  code {
+    overflow-wrap: normal;
+  }
+}
+
+@layer utilities {
+  @media (max-width: 767px) {
+    [data-panel-group][data-panel-group-direction="horizontal"] {
+      flex-direction: column !important;
+    }
+
+    [data-panel-group][data-panel-group-direction="horizontal"] > [data-panel] {
+      width: 100% !important;
+      height: auto !important;
+      flex: 1 1 auto !important;
+    }
+
+    [data-panel-group][data-panel-group-direction="horizontal"] > [data-panel-resize-handle-enabled] {
+      display: none;
+    }
+  }
 }

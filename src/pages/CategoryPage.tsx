@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import MobileAccordionSection from "@/components/MobileAccordionSection";
 import PageSeo from "@/components/PageSeo";
 import ToolCard from "@/components/ToolCard";
 import { categories } from "@/data/categories";
@@ -78,7 +79,7 @@ export default function CategoryPage() {
         schemas={categorySchemas}
       />
 
-      <Breadcrumb>
+      <Breadcrumb className="hidden md:block">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -101,22 +102,24 @@ export default function CategoryPage() {
         </p>
       </header>
 
-      <section className="space-y-4" aria-labelledby="category-benefits">
-        <h2 id="category-benefits" className="text-2xl font-semibold text-foreground">
-          What you can do with these {category.name.toLowerCase()}
-        </h2>
-        <p className="leading-7 text-muted-foreground">
-          This category brings together related ToolStack pages so you can move between similar utilities without
-          repeating the same search. Each page includes SEO-friendly descriptions, structured headings, and related
-          links to help users and search engines understand how the tools connect.
-        </p>
-      </section>
+      <MobileAccordionSection title={`What you can do with these ${category.name.toLowerCase()}`}>
+        <div className="space-y-4" aria-labelledby="category-benefits">
+          <h2 id="category-benefits" className="text-2xl font-semibold text-foreground">
+            What you can do with these {category.name.toLowerCase()}
+          </h2>
+          <p className="leading-7 text-muted-foreground">
+            This category brings together related ToolStack pages so you can move between similar utilities without
+            repeating the same search. Each page includes SEO-friendly descriptions, structured headings, and related
+            links to help users and search engines understand how the tools connect.
+          </p>
+        </div>
+      </MobileAccordionSection>
 
       <section className="space-y-4" aria-labelledby="category-tool-list">
         <h2 id="category-tool-list" className="text-2xl font-semibold text-foreground">
           {category.name} available on ToolStack
         </h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {tools.map((tool) => (
             <ToolCard key={tool.slug} tool={tool} />
           ))}

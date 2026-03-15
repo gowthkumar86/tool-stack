@@ -1,5 +1,14 @@
 import { Link } from "react-router-dom";
-import { Wrench } from "lucide-react";
+import { Menu, Wrench } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,6 +34,47 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               Text
             </Link>
           </nav>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-11 w-11 sm:hidden" aria-label="Open navigation">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[85vw] max-w-xs">
+              <SheetHeader>
+                <SheetTitle>Browse ToolStack</SheetTitle>
+              </SheetHeader>
+              <nav aria-label="Mobile primary" className="mt-6 flex flex-col gap-2">
+                <SheetClose asChild>
+                  <Link to="/" className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted">
+                    Home
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
+                    to="/category/developer-tools"
+                    className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted"
+                  >
+                    Developer
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link to="/category/finance" className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted">
+                    Finance
+                  </Link>
+                </SheetClose>
+                <SheetClose asChild>
+                  <Link
+                    to="/category/text-tools"
+                    className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted"
+                  >
+                    Text
+                  </Link>
+                </SheetClose>
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 

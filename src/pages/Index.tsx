@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import AdPlaceholder from "@/components/AdPlaceholder";
+import MobileAccordionSection from "@/components/MobileAccordionSection";
 import PageSeo from "@/components/PageSeo";
 import ToolCard from "@/components/ToolCard";
 import ToolSearch from "@/components/ToolSearch";
@@ -35,7 +36,7 @@ export default function Index() {
   ];
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-10 px-4 py-8">
+    <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 py-6 md:gap-10 md:py-8">
       <PageSeo
         title="ToolStack - Free Online Developer Tools, Converters and Calculators"
         description="Discover ToolStack, a free collection of online developer tools, JSON viewers, HTML preview tools, HAR analyzers, text utilities, converters, and calculators."
@@ -52,21 +53,23 @@ export default function Index() {
         schemas={homeSchemas}
       />
 
-      <header className="space-y-5 py-6 text-center">
+      <header className="space-y-4 py-2 text-left md:space-y-5 md:py-6 md:text-center">
+        <div className="order-first">
+          <ToolSearch />
+        </div>
         <div className="space-y-3">
           <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
             Free online tools for fast everyday work
           </p>
-          <h1 className="text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+          <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-5xl">
             ToolStack developer tools, calculators, and utilities
           </h1>
-          <p className="mx-auto max-w-3xl text-base leading-7 text-muted-foreground">
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground md:mx-auto md:text-base md:leading-7">
             ToolStack helps developers, teams, and everyday users solve quick tasks in the browser with JSON viewers,
             HTML preview tools, HAR analyzers, text utilities, converters, and calculators. Every page is built to
             be fast, free, and easy to use without a signup.
           </p>
         </div>
-        <ToolSearch />
       </header>
 
       <section className="space-y-4" aria-labelledby="developer-tools-highlight">
@@ -80,7 +83,7 @@ export default function Index() {
           </p>
         </header>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {developerTools.map((tool) => (
             <ToolCard key={tool.slug} tool={tool} />
           ))}
@@ -99,7 +102,7 @@ export default function Index() {
           </p>
         </header>
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {categories.map((category) => {
             const Icon = category.icon;
             const count = allTools.filter((tool) => tool.category === category.slug).length;
@@ -108,7 +111,7 @@ export default function Index() {
               <Link key={category.slug} to={`/category/${category.slug}`}>
                 <Card className="group h-full cursor-pointer transition-shadow hover:shadow-md">
                   <CardContent className="flex items-start gap-3 pb-4 pt-5">
-                    <div className="rounded-lg bg-primary/10 p-2 shrink-0">
+                    <div className="shrink-0 rounded-lg bg-primary/10 p-2">
                       <Icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="min-w-0 text-left">
@@ -144,39 +147,41 @@ export default function Index() {
 
       <AdPlaceholder />
 
-      <section className="space-y-5" aria-labelledby="why-toolstack">
-        <header className="space-y-2">
-          <h2 id="why-toolstack" className="text-2xl font-semibold text-foreground">
-            Why developers use ToolStack
-          </h2>
-          <p className="text-muted-foreground">
-            Search engines and users both respond better when utility sites clearly explain what each tool does.
-            ToolStack focuses on lightweight browser-based workflows so common tasks like inspecting JSON, previewing
-            HTML, converting text, or checking quick calculations are easy to finish in seconds.
-          </p>
-        </header>
+      <MobileAccordionSection title="Why developers use ToolStack">
+        <div className="space-y-5">
+          <header className="space-y-2">
+            <h2 id="why-toolstack" className="text-2xl font-semibold text-foreground">
+              Why developers use ToolStack
+            </h2>
+            <p className="text-muted-foreground">
+              Search engines and users both respond better when utility sites clearly explain what each tool does.
+              ToolStack focuses on lightweight browser-based workflows so common tasks like inspecting JSON, previewing
+              HTML, converting text, or checking quick calculations are easy to finish in seconds.
+            </p>
+          </header>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <article className="rounded-xl border bg-card p-5">
-            <h3 className="text-lg font-semibold text-foreground">Fast browser workflows</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Use free tools online without local installs, account creation, or complex setup.
-            </p>
-          </article>
-          <article className="rounded-xl border bg-card p-5">
-            <h3 className="text-lg font-semibold text-foreground">Developer-focused utility pages</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Find developer utilities like JSON viewer online, HTML preview tools, and HAR file analysis in one place.
-            </p>
-          </article>
-          <article className="rounded-xl border bg-card p-5">
-            <h3 className="text-lg font-semibold text-foreground">Clear internal linking</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Move between related tools faster through category pages, featured collections, and tool-specific related links.
-            </p>
-          </article>
+          <div className="grid gap-4 md:grid-cols-3">
+            <article className="rounded-xl border bg-card p-5">
+              <h3 className="text-lg font-semibold text-foreground">Fast browser workflows</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Use free tools online without local installs, account creation, or complex setup.
+              </p>
+            </article>
+            <article className="rounded-xl border bg-card p-5">
+              <h3 className="text-lg font-semibold text-foreground">Developer-focused utility pages</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Find developer utilities like JSON viewer online, HTML preview tools, and HAR file analysis in one place.
+              </p>
+            </article>
+            <article className="rounded-xl border bg-card p-5">
+              <h3 className="text-lg font-semibold text-foreground">Clear internal linking</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Move between related tools faster through category pages, featured collections, and tool-specific related links.
+              </p>
+            </article>
+          </div>
         </div>
-      </section>
+      </MobileAccordionSection>
 
       {categories.map((category) => {
         const tools = allTools.filter((tool) => tool.category === category.slug).slice(0, 3);
@@ -186,27 +191,33 @@ export default function Index() {
         }
 
         return (
-          <section key={category.slug} className="space-y-3" aria-labelledby={`${category.slug}-preview`}>
-            <div className="flex items-center justify-between gap-4">
-              <div className="space-y-1">
-                <h2 id={`${category.slug}-preview`} className="text-xl font-semibold text-foreground">
-                  {category.name}
-                </h2>
-                <p className="text-sm text-muted-foreground">{category.description}</p>
+          <MobileAccordionSection
+            key={category.slug}
+            title={category.name}
+            className="space-y-3"
+          >
+            <div className="space-y-3" aria-labelledby={`${category.slug}-preview`}>
+              <div className="flex items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h2 id={`${category.slug}-preview`} className="text-xl font-semibold text-foreground">
+                    {category.name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">{category.description}</p>
+                </div>
+                <Link
+                  to={`/category/${category.slug}`}
+                  className="flex items-center gap-1 text-sm text-primary hover:underline"
+                >
+                  View all <ArrowRight className="h-3 w-3" />
+                </Link>
               </div>
-              <Link
-                to={`/category/${category.slug}`}
-                className="flex items-center gap-1 text-sm text-primary hover:underline"
-              >
-                View all <ArrowRight className="h-3 w-3" />
-              </Link>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+                {tools.map((tool) => (
+                  <ToolCard key={tool.slug} tool={tool} />
+                ))}
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-              {tools.map((tool) => (
-                <ToolCard key={tool.slug} tool={tool} />
-              ))}
-            </div>
-          </section>
+          </MobileAccordionSection>
         );
       })}
 
