@@ -8,6 +8,7 @@ import ToolSearch from "@/components/ToolSearch";
 import { Card, CardContent } from "@/components/ui/card";
 import { categories } from "@/data/categories";
 import { allTools, getFeaturedTools, getToolsByCategory } from "@/data/tools";
+import { getCategoryPath } from "@/lib/categoryPaths";
 import { getToolPath } from "@/lib/toolSeo";
 
 export default function Index() {
@@ -108,7 +109,7 @@ export default function Index() {
             const count = allTools.filter((tool) => tool.category === category.slug).length;
 
             return (
-              <Link key={category.slug} to={`/category/${category.slug}`}>
+              <Link key={category.slug} to={getCategoryPath(category.slug)}>
                 <Card className="group h-full cursor-pointer transition-shadow hover:shadow-md">
                   <CardContent className="flex items-start gap-3 pb-4 pt-5">
                     <div className="shrink-0 rounded-lg bg-primary/10 p-2">
@@ -205,7 +206,7 @@ export default function Index() {
                   <p className="text-sm text-muted-foreground">{category.description}</p>
                 </div>
                 <Link
-                  to={`/category/${category.slug}`}
+                  to={getCategoryPath(category.slug)}
                   className="flex items-center gap-1 text-sm text-primary hover:underline"
                 >
                   View all <ArrowRight className="h-3 w-3" />
@@ -220,6 +221,28 @@ export default function Index() {
           </MobileAccordionSection>
         );
       })}
+
+      <section className="space-y-4" aria-labelledby="all-tools">
+        <header className="space-y-2">
+          <h2 id="all-tools" className="text-2xl font-semibold text-foreground">
+            All tools on ToolStack
+          </h2>
+          <p className="text-muted-foreground">
+            Every tool page is linked below so search engines and users can discover the full collection in one place.
+          </p>
+        </header>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {allTools.map((tool) => (
+            <Link
+              key={tool.slug}
+              to={getToolPath(tool)}
+              className="rounded-lg border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:border-primary hover:text-primary"
+            >
+              {tool.name}
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <AdPlaceholder />
     </div>

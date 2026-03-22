@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Menu, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getCategoryPath } from "@/lib/categoryPaths";
 import {
   Sheet,
   SheetClose,
@@ -24,13 +25,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link to="/" className="text-muted-foreground transition-colors hover:text-foreground">
               Home
             </Link>
-            <Link to="/category/developer-tools" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link to={getCategoryPath("developer-tools")} className="text-muted-foreground transition-colors hover:text-foreground">
               Developer
             </Link>
-            <Link to="/category/finance" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link to={getCategoryPath("finance")} className="text-muted-foreground transition-colors hover:text-foreground">
               Finance
             </Link>
-            <Link to="/category/text-tools" className="text-muted-foreground transition-colors hover:text-foreground">
+            <Link to={getCategoryPath("text-tools")} className="text-muted-foreground transition-colors hover:text-foreground">
               Text
             </Link>
           </nav>
@@ -53,20 +54,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    to="/category/developer-tools"
+                    to={getCategoryPath("developer-tools")}
                     className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted"
                   >
                     Developer
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
-                  <Link to="/category/finance" className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted">
+                  <Link to={getCategoryPath("finance")} className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted">
                     Finance
                   </Link>
                 </SheetClose>
                 <SheetClose asChild>
                   <Link
-                    to="/category/text-tools"
+                    to={getCategoryPath("text-tools")}
                     className="rounded-lg px-3 py-3 text-sm font-medium hover:bg-muted"
                   >
                     Text

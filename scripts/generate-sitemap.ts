@@ -16,7 +16,7 @@ const urls = [
   { loc: `${BASE_URL}/privacy-policy`, priority: "0.3" },
   { loc: `${BASE_URL}/terms`, priority: "0.3" },
   ...categories.map((category) => ({
-    loc: `${BASE_URL}/category/${category.slug}`,
+    loc: `${BASE_URL}${category.path ?? `/category/${category.slug}`}`,
     priority: "0.8",
   })),
   ...allTools.map((tool) => ({

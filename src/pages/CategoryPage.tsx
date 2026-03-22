@@ -1,10 +1,11 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import MobileAccordionSection from "@/components/MobileAccordionSection";
 import PageSeo from "@/components/PageSeo";
 import ToolCard from "@/components/ToolCard";
 import { categories } from "@/data/categories";
 import { getToolsByCategory } from "@/data/tools";
+import { getCategoryPath } from "@/lib/categoryPaths";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,16 +16,23 @@ import {
 } from "@/components/ui/breadcrumb";
 import NotFound from "./NotFound";
 
-export default function CategoryPage() {
+interface CategoryPageProps {
+  categorySlug?: string;
+}
+
+export default function CategoryPage({ categorySlug }: CategoryPageProps) {
   const { slug } = useParams<{ slug: string }>();
-  const category = categories.find((item) => item.slug === slug);
+  const location = useLocation();
+  const resolvedSlug = categorySlug ?? slug;
+  const category = categories.find((item) => item.slug === resolvedSlug);
 
   if (!category) {
     return <NotFound />;
   }
 
   const tools = getToolsByCategory(category.slug);
-  const categoryPath = `/category/${category.slug}`;
+  const categoryPath = getCategoryPath(category.slug);
+  const isCanonicalPath = location.pathname === categoryPath;
   const categorySchemas = [
     {
       "@context": "https://schema.org",
@@ -70,6 +78,7 @@ export default function CategoryPage() {
         title={`${category.name} Online Tools | ToolStack`}
         description={`Browse free ${category.name.toLowerCase()} on ToolStack. ${category.description}`}
         path={categoryPath}
+        robots={isCanonicalPath ? "index, follow" : "noindex, follow"}
         keywords={[
           category.name,
           `${category.name.toLowerCase()} online`,

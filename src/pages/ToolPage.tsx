@@ -3,10 +3,13 @@ import ToolEngine from "@/components/ToolEngine";
 import RelatedTools from "@/components/RelatedTools";
 import AdPlaceholder from "@/components/AdPlaceholder";
 import MobileAccordionSection from "@/components/MobileAccordionSection";
+import ToolLongForm from "@/components/ToolLongForm";
 import PageSeo from "@/components/PageSeo";
 import { categories } from "@/data/categories";
 import { getToolBySlug } from "@/data/tools";
+import { getCategoryPath } from "@/lib/categoryPaths";
 import { getLegacyToolPath, getToolPath, getToolSeoCopy, getToolUrl } from "@/lib/toolSeo";
+import { getToolFaqs } from "@/lib/toolContent";
 import {
   Accordion,
   AccordionContent,
@@ -47,6 +50,8 @@ export default function ToolPage() {
   const isLegacyToolUrl = location.pathname === getLegacyToolPath(tool);
   const category = categories.find((item) => item.slug === tool.category);
   const categoryName = category?.name ?? tool.category;
+  const categoryPath = getCategoryPath(tool.category);
+  const faqs = getToolFaqs(tool);
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -62,7 +67,7 @@ export default function ToolPage() {
         "@type": "ListItem",
         position: 2,
         name: categoryName,
-        item: `https://tool-stack.online/category/${tool.category}`,
+        item: `https://tool-stack.online${categoryPath}`,
       },
       {
         "@type": "ListItem",
@@ -90,11 +95,11 @@ export default function ToolPage() {
     },
   };
 
-  const faqSchema = tool.faqs.length > 0
+  const faqSchema = faqs.length > 0
     ? {
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        mainEntity: tool.faqs.map((faq) => ({
+        mainEntity: faqs.map((faq) => ({
           "@type": "Question",
           name: faq.question,
           acceptedAnswer: {
@@ -160,7 +165,7 @@ export default function ToolPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link to={`/category/${tool.category}`}>{categoryName}</Link>
+              <Link to={categoryPath}>{categoryName}</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -193,6 +198,8 @@ export default function ToolPage() {
         </header>
         <ToolEngine tool={tool} />
       </section>
+
+      <ToolLongForm tool={tool} />
 
       <MobileAccordionSection title="What this tool does">
         <section className="space-y-3" aria-labelledby="what-this-tool-does">
@@ -262,14 +269,14 @@ export default function ToolPage() {
         </MobileAccordionSection>
       )}
 
-      {tool.faqs.length > 0 && (
+      {faqs.length > 0 && (
         <MobileAccordionSection title="Frequently asked questions">
           <section className="space-y-3" aria-labelledby="faq-heading">
             <h2 id="faq-heading" className="text-2xl font-semibold text-foreground">
               Frequently asked questions
             </h2>
             <Accordion type="single" collapsible className="w-full rounded-xl border px-4">
-              {tool.faqs.map((faq, index) => (
+              {faqs.map((faq, index) => (
                 <AccordionItem key={faq.question} value={`faq-${index}`}>
                   <AccordionTrigger className="text-left">{faq.question}</AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">{faq.answer}</AccordionContent>

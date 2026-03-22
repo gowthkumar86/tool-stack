@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import * as HelmetAsync from "react-helmet-async";
 import { DEFAULT_KEYWORDS, DEFAULT_OG_IMAGE, SITE_NAME, toAbsoluteUrl } from "@/lib/site";
 
 interface PageSeoProps {
@@ -24,6 +24,7 @@ export default function PageSeo({
 }: PageSeoProps) {
   const url = toAbsoluteUrl(path);
   const mergedKeywords = Array.from(new Set([...DEFAULT_KEYWORDS, ...keywords]));
+  const Helmet = HelmetAsync.Helmet;
 
   return (
     <Helmet prioritizeSeoTags>

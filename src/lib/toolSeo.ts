@@ -255,7 +255,7 @@ export function getToolSeoCopy(tool: ToolConfig): ToolSeoCopy {
   const override = toolOverrides[tool.slug];
 
   return {
-    title: override?.title ?? buildGenericTitle(tool),
+    title: override?.title ?? (tool.seoTitle ? `${tool.seoTitle} | ${SITE_NAME}` : buildGenericTitle(tool)),
     description: override?.description ?? buildGenericDescription(tool),
     keywords: getToolKeywords(tool),
     introParagraph: override?.introParagraph ?? buildGenericIntro(tool),
