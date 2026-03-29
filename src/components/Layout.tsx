@@ -1,7 +1,7 @@
 import { Outlet, useLocation } from "react-router-dom";
 import Navbar from "./Navbar";
 import Container from "./ui/Container";
-import PageTransition from "./ui/pageTransition";
+import PageTransition from "./ui/PageTransition";
 
 function Layout() {
   const location = useLocation();
