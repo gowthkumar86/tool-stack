@@ -1,9 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
-import { categories } from "../src/data/categories.ts";
-import { allTools } from "../src/data/tools.ts";
-import { render } from "../src/entry-server.tsx";
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const distDir = resolve(scriptDir, "../dist");
@@ -15,34 +12,25 @@ if (!existsSync(templatePath)) {
 
 const template = readFileSync(templatePath, "utf-8");
 
-const staticRoutes = ["/", "/about", "/contact", "/privacy-policy", "/terms"];
-const categoryRoutes = categories.map((category) => category.path ?? `/category/${category.slug}`);
-const toolRoutes = allTools.map((tool) => `/${tool.slug}`);
-
-const routes = Array.from(new Set([...staticRoutes, ...categoryRoutes, ...toolRoutes]));
-
-function injectHtml(baseHtml: string, appHtml: string, headHtml: string) {
-  const withRoot = baseHtml.replace(
-    '<div id="root"></div>',
-    `<div id="root">${appHtml}</div>`
-  );
-
-  return withRoot.replace("</head>", `${headHtml}</head>`);
-}
+const routes = [
+  "/",
+  "/har-analyzer",
+  "/json-formatter",
+  "/gst-calculator",
+  "/about",
+  "/contact",
+  "/privacy",
+];
 
 for (const route of routes) {
   try {
-    const { html, head } = render(route);
-    const finalHtml = injectHtml(template, html, head);
-
     if (route === "/") {
-      writeFileSync(templatePath, finalHtml);
       continue;
     }
 
     const outputDir = resolve(distDir, route.replace(/^\//, ""));
     mkdirSync(outputDir, { recursive: true });
-    writeFileSync(resolve(outputDir, "index.html"), finalHtml);
+    writeFileSync(resolve(outputDir, "index.html"), template);
   } catch (error) {
     console.error(`Prerender failed for ${route}`, error);
     throw error;

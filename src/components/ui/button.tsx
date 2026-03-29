@@ -1,47 +1,38 @@
-import * as React from "react";
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { cn } from "../../lib/cn";
 
-import { cn } from "@/lib/utils";
+type ButtonVariant = "primary" | "secondary" | "ghost";
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  },
-);
-
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
-  },
-);
-Button.displayName = "Button";
+const variantClasses: Record<ButtonVariant, string> = {
+  primary:
+    "border border-emerald-300/30 bg-emerald-500/15 text-emerald-100 hover:scale-[1.02] hover:border-emerald-200/40 hover:bg-emerald-400/20 hover:shadow-[0_10px_28px_rgba(16,185,129,0.16)]",
+  secondary:
+    "border border-[var(--border-muted)] bg-[var(--surface-muted)] text-[var(--text-strong)] hover:scale-[1.02] hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]",
+  ghost:
+    "border border-transparent text-[var(--text-subtle)] hover:scale-[1.02] hover:border-[var(--border-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-strong)]",
+};
 
-export { Button, buttonVariants };
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { variant = "secondary", className, type = "button", ...props },
+  ref,
+) {
+  return (
+    <button
+      ref={ref}
+      type={type}
+      className={cn(
+        "inline-flex items-center justify-center rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] disabled:cursor-not-allowed disabled:opacity-50",
+        variantClasses[variant],
+        className,
+      )}
+      {...props}
+    />
+  );
+});
+
+export default Button;
+
