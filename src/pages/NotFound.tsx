@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import Card from "../components/ui/Card";
+import Card from "../components/ui/card";
 import { setSEO } from "../utils/seo";
 
 function NotFound() {
