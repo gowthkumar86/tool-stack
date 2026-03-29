@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import ContentSection from "../../components/ContentSection";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/button";
 import Card from "../../components/ui/card";
-import EmptyState from "../../components/ui/EmptyState";
+import EmptyState from "../../components/ui/emptyState";
 import Skeleton from "../../components/ui/skeleton";
 import { setSEO } from "../../utils/seo";
 import { formatJSON, minifyJSON, validateJSON } from "./jsonUtils";

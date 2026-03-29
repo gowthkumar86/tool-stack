@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ContentSection from "../../components/ContentSection";
-import Button from "../../components/ui/Button";
+import Button from "../../components/ui/button";
 import Card from "../../components/ui/Card";
-import EmptyState from "../../components/ui/EmptyState";
+import EmptyState from "../../components/ui/emptyState";
 import Skeleton from "../../components/ui/Skeleton";
 import { setSEO } from "../../utils/seo";
 import {
@@ -150,7 +150,7 @@ function HarAnalyzerPage() {
 
   useEffect(() => {
     setSEO({
-      title: "Analyze HAR Files – Find Slow Requests & Errors",
+      title: "Analyze HAR Files ï¿½ Find Slow Requests & Errors",
       description:
         "Analyze HAR files to find slow requests, status-code spikes, and API bottlenecks. Practical debugging insights without dashboard overhead.",
     });

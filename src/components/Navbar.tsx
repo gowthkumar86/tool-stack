@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { cn } from "../lib/cn";
-import Container from "./ui/Container";
+import Container from "./ui/container";
 
 const navItems = [
   { path: "/", label: "Home" },
