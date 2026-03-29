@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import ContentSection from "../components/ContentSection";
-import Card from "../components/ui/Card";
+import Card from "../components/ui/card";
 import { setSEO } from "../utils/seo";
 
 function AboutPage() {
