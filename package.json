@@ -12,7 +12,7 @@
         "test:watch": "vitest",
         "generate:sitemap": "ts-node scripts/generate-sitemap.ts",
         "prerender": "node scripts/prerender-launcher.mjs",
-        "build": "vite build"
+        "build": "tsc && vite build"
     },
     "dependencies": {
         "@hookform/resolvers": "^3.10.0",
