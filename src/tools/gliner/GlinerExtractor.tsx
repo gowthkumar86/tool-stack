@@ -8,6 +8,7 @@ import {
   extractWithCustomLabels,
   extractWithUseCase,
   fetchUseCases,
+  preloadGlinerModel,
 } from "./api";
 import ExtractButton from "./components/ExtractButton";
 import LabelsInput from "./components/LabelsInput";
@@ -53,6 +54,8 @@ export default function GlinerExtractorPage() {
   const [customInputText, setCustomInputText] = useState("");
   const [labelsInput, setLabelsInput] = useState("person, organization, role, date");
   const [isLoadingUseCases, setIsLoadingUseCases] = useState(true);
+  const [isPreparingModel, setIsPreparingModel] = useState(true);
+  const [modelLoadError, setModelLoadError] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [configuredResult, setConfiguredResult] = useState<ConfiguredExtractionResponse | null>(null);
@@ -66,7 +69,7 @@ export default function GlinerExtractorPage() {
   );
 
   const canExtract = useMemo(() => {
-    if (isExtracting) {
+    if (isExtracting || isPreparingModel || Boolean(modelLoadError)) {
       return false;
     }
 
@@ -75,7 +78,7 @@ export default function GlinerExtractorPage() {
     }
 
     return Boolean(customInputText.trim()) && parsedLabels.length > 0;
-  }, [customInputText, isExtracting, mode, parsedLabels.length, selectedUseCase, useCaseInputText]);
+  }, [customInputText, isExtracting, isPreparingModel, mode, modelLoadError, parsedLabels.length, selectedUseCase, useCaseInputText]);
 
   useEffect(() => {
     setSEO({
@@ -121,6 +124,48 @@ export default function GlinerExtractorPage() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function warmupModel() {
+      setIsPreparingModel(true);
+      setModelLoadError("");
+
+      try {
+        await preloadGlinerModel();
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setModelLoadError(error instanceof Error ? error.message : "Could not load GLiNER model in browser.");
+      } finally {
+        if (!cancelled) {
+          setIsPreparingModel(false);
+        }
+      }
+    }
+
+    void warmupModel();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleRetryModelLoad() {
+    setIsPreparingModel(true);
+    setModelLoadError("");
+
+    try {
+      await preloadGlinerModel();
+    } catch (error) {
+      setModelLoadError(error instanceof Error ? error.message : "Could not load GLiNER model in browser.");
+    } finally {
+      setIsPreparingModel(false);
+    }
+  }
 
   async function handleExtract() {
     if (!canExtract) {
@@ -273,12 +318,40 @@ export default function GlinerExtractorPage() {
             />
             {!canExtract && (
               <p className="text-xs text-slate-400">
-                {mode === "use-case"
-                  ? "Enter input text and choose a use case to extract."
-                  : "Enter input text and labels to extract."}
+                {isPreparingModel
+                  ? "GLiNER model is loading in your browser."
+                  : modelLoadError
+                    ? "Retry model load to continue."
+                    : mode === "use-case"
+                      ? "Enter input text and choose a use case to extract."
+                      : "Enter input text and labels to extract."}
               </p>
             )}
           </div>
+
+          {isPreparingModel && (
+            <div className="rounded-md border border-sky-500/40 bg-sky-500/10 p-3 text-sm text-sky-200">
+              <p className="font-medium">Loading GLiNER model in browser...</p>
+              <p className="mt-1 text-xs text-sky-100/90">
+                First run downloads model files. This can take 20-60 seconds based on network/device speed.
+              </p>
+            </div>
+          )}
+
+          {modelLoadError && (
+            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">
+              <p>{modelLoadError}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  void handleRetryModelLoad();
+                }}
+                className="mt-2 rounded border border-amber-300/40 bg-amber-400/10 px-3 py-1 text-xs text-amber-100 hover:bg-amber-400/20"
+              >
+                Retry model load
+              </button>
+            </div>
+          )}
 
           {errorMessage && (
             <p className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
