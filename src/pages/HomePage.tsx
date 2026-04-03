@@ -26,6 +26,13 @@ const toolCards = [
     path: "/gst-calculator",
     isNew: false,
   },
+  {
+    title: "GLiNER Extractor",
+    description:
+      "Extract structured entities from resumes, invoices, and business text using configured use cases or custom labels.",
+    path: "/gliner-extractor",
+    isNew: true,
+  },
 ];
 
 function HomePage() {
@@ -33,13 +40,12 @@ function HomePage() {
     setSEO({
       title: "Smart Developer Tools - Debug Faster, Extract Smarter",
       description:
-        "Developer-focused tools to analyze HAR files, debug JSON, extract insights from logs, and avoid costly mistakes in real workflows.",
+        "Developer-focused tools to analyze HAR files, debug JSON, extract entities, and avoid costly mistakes in real workflows.",
     });
   }, []);
 
   return (
     <article className="space-y-6">
-      {/* Header */}
       <Card>
         <h1 className="text-3xl font-bold tracking-tight text-[var(--text-strong)]">
           Smart Developer Tools
@@ -49,42 +55,36 @@ function HomePage() {
         </p>
       </Card>
 
-      {/* Tools */}
       <section
         aria-label="Tool list"
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {toolCards.map((tool) => (
           <Card key={tool.path} hoverable>
-            {/* NEW badge (optional) */}
             {tool.isNew && (
               <span className="absolute top-3 right-3 text-xs bg-emerald-400 text-black px-2 py-1 rounded-full font-semibold">
                 NEW
               </span>
             )}
 
-            {/* Title */}
             <h2 className="text-lg font-semibold text-[var(--text-strong)]">
               {tool.title}
             </h2>
 
-            {/* Description */}
             <p className="mt-2 text-sm leading-6 text-[var(--text-body)]">
               {tool.description}
             </p>
 
-            {/* CTA */}
             <Link
               to={tool.path}
               className="mt-4 inline-flex rounded-xl border border-emerald-300/30 bg-emerald-500/12 px-3 py-2 text-sm font-medium text-emerald-100 transition-all duration-200 ease-in-out hover:scale-[1.02] hover:border-emerald-200/45 hover:bg-emerald-400/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45"
             >
-              Open Tool →
+              Open Tool {"->"}
             </Link>
           </Card>
         ))}
       </section>
 
-      {/* Content */}
       <ContentSection title="How Developers Actually Use These Tools">
         <p>
           Example workflow: inspect a failing request in{" "}
@@ -95,11 +95,14 @@ function HomePage() {
           <Link to="/json-formatter" className="text-emerald-300">
             JSON Formatter
           </Link>
-          , then share clean payload evidence in your incident ticket.
+          , then run entity extraction in{" "}
+          <Link to="/gliner-extractor" className="text-emerald-300">
+            GLiNER Extractor
+          </Link>
+          .
         </p>
         <p>
-          If your project includes billing logic, run the same payload
-          assumptions through the{" "}
+          If your project includes billing logic, run the same payload assumptions through the{" "}
           <Link to="/gst-calculator" className="text-emerald-300">
             GST Tool
           </Link>{" "}
@@ -111,6 +114,7 @@ function HomePage() {
         <ul className="list-disc space-y-2 pl-5">
           <li>HAR Analyzer shows what happened.</li>
           <li>JSON Formatter makes payloads readable.</li>
+          <li>GLiNER Extractor turns text into structured entities.</li>
           <li>GST Tool prevents silent pricing mistakes.</li>
         </ul>
       </ContentSection>
@@ -119,3 +123,4 @@ function HomePage() {
 }
 
 export default HomePage;
+

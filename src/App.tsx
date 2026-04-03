@@ -13,6 +13,7 @@ const PrivacyPage = lazy(() => import("./pages/PrivacyPage"));
 const HarAnalyzerPage = lazy(() => import("./tools/har-analyzer/HarAnalyzerPage"));
 const JsonFormatterPage = lazy(() => import("./tools/json-formatter/JsonFormatterPage"));
 const GstCalculatorPage = lazy(() => import("./tools/gst-calculator/GstCalculatorPage"));
+const GlinerExtractorPage = lazy(() => import("./tools/gliner/GlinerExtractor"));
 
 function withFallback(element: ReactNode) {
   return <Suspense fallback={<PageLoadingState />}>{element}</Suspense>;
@@ -27,6 +28,7 @@ function App() {
           <Route path="/har-analyzer" element={withFallback(<HarAnalyzerPage />)} />
           <Route path="/json-formatter" element={withFallback(<JsonFormatterPage />)} />
           <Route path="/gst-calculator" element={withFallback(<GstCalculatorPage />)} />
+          <Route path="/gliner-extractor" element={withFallback(<GlinerExtractorPage />)} />
           <Route path="/about" element={withFallback(<AboutPage />)} />
           <Route path="/contact" element={withFallback(<ContactPage />)} />
           <Route path="/privacy" element={withFallback(<PrivacyPage />)} />
