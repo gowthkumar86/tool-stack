@@ -9,10 +9,10 @@ import type { ExecutionProvider, Gliner as GlinerEngine, IEntityResult } from "g
 
 const GLINER_TOKENIZER_REPO =
   (import.meta.env.VITE_GLINER_TOKENIZER_REPO as string | undefined)?.trim()
-  || "onnx-community/gliner_small-v2.1";
+  || "onnx-community/gliner_medium-v2.1";
 const GLINER_ONNX_MODEL_URL =
   (import.meta.env.VITE_GLINER_ONNX_MODEL_URL as string | undefined)?.trim()
-  || "https://huggingface.co/onnx-community/gliner_small-v2.1/resolve/main/onnx/model_int8.onnx";
+  || "https://huggingface.co/onnx-community/gliner_medium-v2.1/resolve/main/onnx/model.onnx";
 const ONNX_WASM_PATH =
   (import.meta.env.VITE_GLINER_ONNX_WASM_PATH as string | undefined)?.trim()
   || "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.19.2/dist/";
@@ -20,6 +20,9 @@ const rawThreshold = Number.parseFloat((import.meta.env.VITE_GLINER_THRESHOLD as
 const EXTRACTION_THRESHOLD = Number.isFinite(rawThreshold) ? rawThreshold : 0.35;
 const LONG_TEXT_WORD_THRESHOLD =
   Number.parseInt((import.meta.env.VITE_GLINER_LONG_TEXT_WORD_THRESHOLD as string | undefined) ?? "", 10) || 280;
+const MODEL_CACHE_DB_NAME = "gliner-onnx-cache";
+const MODEL_CACHE_STORE_NAME = "models";
+const MODEL_CACHE_KEY = `model:${GLINER_ONNX_MODEL_URL}`;
 
 type NormalizerRule = "lower" | "upper";
 
@@ -128,6 +131,108 @@ const LOCAL_USE_CASES: LocalUseCaseDefinition[] = [
 ];
 
 let glinerModelPromise: Promise<GlinerEngine> | null = null;
+let modelBinaryPromise: Promise<Uint8Array> | null = null;
+
+function hasIndexedDb(): boolean {
+  return typeof indexedDB !== "undefined";
+}
+
+function openModelCacheDb(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(MODEL_CACHE_DB_NAME, 1);
+
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(MODEL_CACHE_STORE_NAME)) {
+        db.createObjectStore(MODEL_CACHE_STORE_NAME);
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error ?? new Error("Could not open model cache database."));
+  });
+}
+
+async function readModelBinaryFromCache(): Promise<Uint8Array | null> {
+  if (!hasIndexedDb()) {
+    return null;
+  }
+
+  try {
+    const db = await openModelCacheDb();
+    const value = await new Promise<unknown>((resolve, reject) => {
+      const transaction = db.transaction(MODEL_CACHE_STORE_NAME, "readonly");
+      const store = transaction.objectStore(MODEL_CACHE_STORE_NAME);
+      const request = store.get(MODEL_CACHE_KEY);
+
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error ?? new Error("Could not read model cache."));
+    });
+    db.close();
+
+    if (value instanceof Uint8Array) {
+      return value;
+    }
+    if (value instanceof ArrayBuffer) {
+      return new Uint8Array(value);
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeModelBinaryToCache(modelBytes: Uint8Array): Promise<void> {
+  if (!hasIndexedDb()) {
+    return;
+  }
+
+  try {
+    const db = await openModelCacheDb();
+    await new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction(MODEL_CACHE_STORE_NAME, "readwrite");
+      const store = transaction.objectStore(MODEL_CACHE_STORE_NAME);
+      const request = store.put(modelBytes, MODEL_CACHE_KEY);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error ?? new Error("Could not write model cache."));
+    });
+    db.close();
+  } catch {
+    // Ignore cache write failures (private mode/quota); inference still works via network path.
+  }
+}
+
+async function downloadModelBinary(): Promise<Uint8Array> {
+  const response = await fetch(GLINER_ONNX_MODEL_URL, { cache: "force-cache" });
+  if (!response.ok) {
+    throw new Error(`Failed to download model (${response.status}).`);
+  }
+  const buffer = await response.arrayBuffer();
+  return new Uint8Array(buffer);
+}
+
+async function getCachedModelBinary(): Promise<Uint8Array> {
+  const cachedBytes = await readModelBinaryFromCache();
+  if (cachedBytes) {
+    return cachedBytes;
+  }
+
+  const downloadedBytes = await downloadModelBinary();
+  await writeModelBinaryToCache(downloadedBytes);
+  return downloadedBytes;
+}
+
+async function getModelBinary(): Promise<Uint8Array> {
+  if (!modelBinaryPromise) {
+    modelBinaryPromise = getCachedModelBinary().catch((error) => {
+      modelBinaryPromise = null;
+      throw error;
+    });
+  }
+
+  return modelBinaryPromise;
+}
 
 async function supportsWebGpu(): Promise<boolean> {
   if (typeof navigator === "undefined" || !("gpu" in navigator)) {
@@ -158,11 +263,12 @@ function toPromptLabel(label: string): string {
 
 async function createModel(executionProvider: ExecutionProvider): Promise<GlinerEngine> {
   const { Gliner } = await import("gliner");
+  const modelBinary = await getModelBinary();
 
   const model = new Gliner({
     tokenizerPath: GLINER_TOKENIZER_REPO,
     onnxSettings: {
-      modelPath: GLINER_ONNX_MODEL_URL,
+      modelPath: modelBinary,
       executionProvider,
       wasmPaths: ONNX_WASM_PATH,
       multiThread: executionProvider === "wasm",

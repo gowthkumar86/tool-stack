@@ -22,6 +22,7 @@ import type {
 } from "./types";
 
 type Mode = "use-case" | "custom";
+const MODEL_CONSENT_STORAGE_KEY = "gliner_model_download_consent_v1";
 
 function parseLabels(input: string): string[] {
   return input
@@ -54,7 +55,16 @@ export default function GlinerExtractorPage() {
   const [customInputText, setCustomInputText] = useState("");
   const [labelsInput, setLabelsInput] = useState("person, organization, role, date");
   const [isLoadingUseCases, setIsLoadingUseCases] = useState(true);
-  const [isPreparingModel, setIsPreparingModel] = useState(true);
+  const [isPreparingModel, setIsPreparingModel] = useState(false);
+  const [isModelReady, setIsModelReady] = useState(false);
+  const [hasModelConsent, setHasModelConsent] = useState<boolean>(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+    return window.localStorage.getItem(MODEL_CONSENT_STORAGE_KEY) === "true";
+  });
+  const [showModelConsentModal, setShowModelConsentModal] = useState(false);
+  const [pendingExtractAfterModelLoad, setPendingExtractAfterModelLoad] = useState(false);
   const [modelLoadError, setModelLoadError] = useState("");
   const [isExtracting, setIsExtracting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -69,7 +79,7 @@ export default function GlinerExtractorPage() {
   );
 
   const canExtract = useMemo(() => {
-    if (isExtracting || isPreparingModel || Boolean(modelLoadError)) {
+    if (isExtracting || isPreparingModel) {
       return false;
     }
 
@@ -125,41 +135,14 @@ export default function GlinerExtractorPage() {
     };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function warmupModel() {
-      setIsPreparingModel(true);
-      setModelLoadError("");
-
-      try {
-        await preloadGlinerModel();
-      } catch (error) {
-        if (cancelled) {
-          return;
-        }
-
-        setModelLoadError(error instanceof Error ? error.message : "Could not load GLiNER model in browser.");
-      } finally {
-        if (!cancelled) {
-          setIsPreparingModel(false);
-        }
-      }
-    }
-
-    void warmupModel();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function handleRetryModelLoad() {
+  async function loadModelInBrowserSession() {
     setIsPreparingModel(true);
     setModelLoadError("");
 
     try {
       await preloadGlinerModel();
+      setIsModelReady(true);
+      setShowModelConsentModal(false);
     } catch (error) {
       setModelLoadError(error instanceof Error ? error.message : "Could not load GLiNER model in browser.");
     } finally {
@@ -167,8 +150,8 @@ export default function GlinerExtractorPage() {
     }
   }
 
-  async function handleExtract() {
-    if (!canExtract) {
+  async function runExtraction() {
+    if (!canExtract || !isModelReady) {
       return;
     }
 
@@ -196,12 +179,44 @@ export default function GlinerExtractorPage() {
     }
   }
 
+  useEffect(() => {
+    if (!pendingExtractAfterModelLoad || !isModelReady || isPreparingModel) {
+      return;
+    }
+
+    setPendingExtractAfterModelLoad(false);
+    void runExtraction();
+  }, [isModelReady, isPreparingModel, pendingExtractAfterModelLoad]);
+
+  function handleExtract() {
+    if (!canExtract) {
+      return;
+    }
+
+    if (!isModelReady) {
+      if (hasModelConsent) {
+        setPendingExtractAfterModelLoad(true);
+        void loadModelInBrowserSession();
+        return;
+      }
+
+      setPendingExtractAfterModelLoad(true);
+      setShowModelConsentModal(true);
+      return;
+    }
+
+    void runExtraction();
+  }
+
   return (
     <article className="space-y-6">
       <Card>
         <h1 className="text-3xl font-bold text-gray-100">GLiNER Entity Extraction Tool</h1>
         <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-300">
           Run extraction in two ways: choose a predefined use case for structured business output, or switch to custom labels for ad-hoc analysis.
+        </p>
+        <p className="mt-2 text-xs text-slate-400">
+          First extraction asks permission to download the GLiNER model once and persist it in browser storage.
         </p>
       </Card>
 
@@ -311,7 +326,7 @@ export default function GlinerExtractorPage() {
           <div className="flex items-center gap-3">
             <ExtractButton
               onClick={() => {
-                void handleExtract();
+                handleExtract();
               }}
               disabled={!canExtract}
               loading={isExtracting}
@@ -320,38 +335,12 @@ export default function GlinerExtractorPage() {
               <p className="text-xs text-slate-400">
                 {isPreparingModel
                   ? "GLiNER model is loading in your browser."
-                  : modelLoadError
-                    ? "Retry model load to continue."
-                    : mode === "use-case"
-                      ? "Enter input text and choose a use case to extract."
-                      : "Enter input text and labels to extract."}
+                  : mode === "use-case"
+                    ? "Enter input text and choose a use case to extract."
+                    : "Enter input text and labels to extract."}
               </p>
             )}
           </div>
-
-          {isPreparingModel && (
-            <div className="rounded-md border border-sky-500/40 bg-sky-500/10 p-3 text-sm text-sky-200">
-              <p className="font-medium">Loading GLiNER model in browser...</p>
-              <p className="mt-1 text-xs text-sky-100/90">
-                First run downloads model files. This can take 20-60 seconds based on network/device speed.
-              </p>
-            </div>
-          )}
-
-          {modelLoadError && (
-            <div className="rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-200">
-              <p>{modelLoadError}</p>
-              <button
-                type="button"
-                onClick={() => {
-                  void handleRetryModelLoad();
-                }}
-                className="mt-2 rounded border border-amber-300/40 bg-amber-400/10 px-3 py-1 text-xs text-amber-100 hover:bg-amber-400/20"
-              >
-                Retry model load
-              </button>
-            </div>
-          )}
 
           {errorMessage && (
             <p className="rounded-md border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
@@ -455,6 +444,108 @@ export default function GlinerExtractorPage() {
           context errors early.
         </p>
       </ContentSection>
+
+      <ContentSection title="Browser Model Usage Guide">
+        <ul className="list-disc space-y-2 pl-5">
+          <li>The model is not downloaded when this page opens. Download starts only after you click Extract and approve.</li>
+          <li>The download happens inside your browser session (client-side), not on your backend server.</li>
+          <li>Once approved, this browser remembers your consent and will not ask again on every refresh.</li>
+          <li>First-time load can take 1-3 minutes depending on network and device speed.</li>
+          <li>The ONNX model file is saved in persistent browser storage (IndexedDB) for reuse across refreshes.</li>
+          <li>After loading once, extraction calls reuse the same in-memory model instance during this session.</li>
+          <li>Re-download happens only if you clear site data/cache (or if the browser evicts storage).</li>
+          <li>If you choose Cancel in the popup, extraction will not run until you approve download.</li>
+          <li>For best results, provide complete text context and specific labels instead of overly broad labels.</li>
+        </ul>
+      </ContentSection>
+
+      {(showModelConsentModal || isPreparingModel || Boolean(modelLoadError)) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4" role="dialog" aria-modal="true" aria-label="Loading GLiNER model">
+          <div className="w-full max-w-md rounded-xl border border-sky-500/40 bg-slate-900 p-5 shadow-2xl">
+            {isPreparingModel ? (
+              <>
+                <div className="flex items-center gap-3">
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-sky-200 border-t-transparent" aria-hidden="true" />
+                  <h3 className="text-base font-semibold text-sky-100">Loading GLiNER medium model...</h3>
+                </div>
+                <p className="mt-3 text-sm text-slate-200">
+                  Downloading and preparing model files inside your browser.
+                </p>
+                <p className="mt-1 text-xs text-slate-300">
+                  First run can take around 1-3 minutes depending on network and device performance.
+                </p>
+              </>
+            ) : modelLoadError ? (
+              <>
+                <h3 className="text-base font-semibold text-amber-100">Model Download Failed</h3>
+                <p className="mt-3 text-sm text-amber-200">{modelLoadError}</p>
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModelConsentModal(false);
+                      setPendingExtractAfterModelLoad(false);
+                      setModelLoadError("");
+                    }}
+                    className="rounded border border-slate-600 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
+                  >
+                    Close
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void loadModelInBrowserSession();
+                    }}
+                    className="rounded border border-amber-300/40 bg-amber-400/10 px-3 py-1.5 text-xs text-amber-100 hover:bg-amber-400/20"
+                  >
+                    Retry Download
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="text-base font-semibold text-sky-100">Download GLiNER Model in Browser?</h3>
+                <p className="mt-3 text-sm text-slate-200">
+                  To run extraction fully client-side, this page must load the GLiNER ONNX model in your browser session.
+                </p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-slate-300">
+                  <li>No backend extraction call is made.</li>
+                  <li>Initial download may take 1-3 minutes.</li>
+                  <li>Model file is stored persistently in browser storage for future refreshes.</li>
+                  <li>Your consent is remembered in this browser.</li>
+                  <li>You can continue only after the model is loaded.</li>
+                </ul>
+                <div className="mt-4 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowModelConsentModal(false);
+                      setPendingExtractAfterModelLoad(false);
+                      setModelLoadError("");
+                    }}
+                    className="rounded border border-slate-600 px-3 py-1.5 text-xs text-slate-200 hover:bg-slate-800"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        window.localStorage.setItem(MODEL_CONSENT_STORAGE_KEY, "true");
+                      }
+                      setHasModelConsent(true);
+                      void loadModelInBrowserSession();
+                    }}
+                    className="rounded border border-sky-300/40 bg-sky-400/10 px-3 py-1.5 text-xs text-sky-100 hover:bg-sky-400/20"
+                  >
+                    Proceed and Download
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </article>
   );
 }
