@@ -47,6 +47,18 @@ function modeLabel(mode: Mode): string {
   return "Custom Mode";
 }
 
+function downloadJsonFile(filename: string, payload: unknown) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
 export default function GlinerExtractorPage() {
   const [mode, setMode] = useState<Mode>("use-case");
   const [useCases, setUseCases] = useState<UseCaseDefinition[]>([]);
@@ -77,6 +89,32 @@ export default function GlinerExtractorPage() {
     () => useCases.find((useCase) => useCase.key === selectedUseCase) ?? null,
     [selectedUseCase, useCases],
   );
+
+  const downloadableResult = useMemo(() => {
+    if (mode === "use-case") {
+      if (!configuredResult) {
+        return null;
+      }
+
+      return {
+        mode: "use-case",
+        use_case: configuredResult.use_case,
+        grouped_entities: configuredResult.grouped_entities ?? {},
+        entities: configuredResult.entities,
+        exported_at: new Date().toISOString(),
+      };
+    }
+
+    if (!customResult) {
+      return null;
+    }
+
+    return {
+      mode: "custom",
+      entities: customResult.entities,
+      exported_at: new Date().toISOString(),
+    };
+  }, [configuredResult, customResult, mode]);
 
   const canExtract = useMemo(() => {
     if (isExtracting || isPreparingModel) {
@@ -350,13 +388,30 @@ export default function GlinerExtractorPage() {
         </Card>
 
         <Card hoverable className="space-y-4">
-          <header>
-            <h2 className="text-lg font-semibold text-slate-100">Extraction Results</h2>
-            <p className="mt-1 text-sm text-slate-300">
-              {mode === "use-case"
-                ? "Grouped entities are shown first for business use, followed by raw entities for debugging."
-                : "Custom extraction entities are shown below."}
-            </p>
+          <header className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-100">Extraction Results</h2>
+              <p className="mt-1 text-sm text-slate-300">
+                {mode === "use-case"
+                  ? "Grouped entities are shown first for business use, followed by raw entities for debugging."
+                  : "Custom extraction entities are shown below."}
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled={!downloadableResult || isExtracting}
+              onClick={() => {
+                if (!downloadableResult) {
+                  return;
+                }
+                const filePrefix = mode === "use-case" ? "gliner-use-case" : "gliner-custom";
+                const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+                downloadJsonFile(`${filePrefix}-${timestamp}.json`, downloadableResult);
+              }}
+              className="rounded border border-emerald-300/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-100 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:border-slate-600 disabled:bg-slate-800 disabled:text-slate-400"
+            >
+              Download JSON
+            </button>
           </header>
 
           {isExtracting ? (
