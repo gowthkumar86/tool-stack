@@ -1,5 +1,7 @@
 import { Suspense, lazy, type ReactNode } from "react";
 import { Route, Routes } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
+
 import Layout from "./components/Layout";
 import PageLoadingState from "./components/PageLoadingState";
 
@@ -18,20 +20,23 @@ function withFallback(element: ReactNode) {
 
 function App() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={withFallback(<HomePage />)} />
-        <Route path="/har-analyzer" element={withFallback(<HarAnalyzerPage />)} />
-        <Route path="/json-formatter" element={withFallback(<JsonFormatterPage />)} />
-        <Route path="/gst-calculator" element={withFallback(<GstCalculatorPage />)} />
-        <Route path="/about" element={withFallback(<AboutPage />)} />
-        <Route path="/contact" element={withFallback(<ContactPage />)} />
-        <Route path="/privacy" element={withFallback(<PrivacyPage />)} />
-        <Route path="*" element={withFallback(<NotFound />)} />
-      </Route>
-    </Routes>
+    <>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={withFallback(<HomePage />)} />
+          <Route path="/har-analyzer" element={withFallback(<HarAnalyzerPage />)} />
+          <Route path="/json-formatter" element={withFallback(<JsonFormatterPage />)} />
+          <Route path="/gst-calculator" element={withFallback(<GstCalculatorPage />)} />
+          <Route path="/about" element={withFallback(<AboutPage />)} />
+          <Route path="/contact" element={withFallback(<ContactPage />)} />
+          <Route path="/privacy" element={withFallback(<PrivacyPage />)} />
+          <Route path="*" element={withFallback(<NotFound />)} />
+        </Route>
+      </Routes>
+
+      <Analytics />
+    </>
   );
 }
 
 export default App;
-
