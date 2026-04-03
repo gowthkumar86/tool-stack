@@ -116,6 +116,34 @@ export default function GlinerExtractorPage() {
     };
   }, [configuredResult, customResult, mode]);
 
+  const extractedEntityCount = useMemo(() => {
+    if (mode === "use-case") {
+      return configuredResult?.entities.length ?? 0;
+    }
+    return customResult?.entities.length ?? 0;
+  }, [configuredResult, customResult, mode]);
+
+  const modelStatusMeta = useMemo(() => {
+    if (isPreparingModel) {
+      return {
+        label: "Model: Loading",
+        className: "border-sky-400/40 bg-sky-500/10 text-sky-200",
+      };
+    }
+
+    if (isModelReady) {
+      return {
+        label: "Model: Ready",
+        className: "border-emerald-400/40 bg-emerald-500/10 text-emerald-200",
+      };
+    }
+
+    return {
+      label: "Model: Not Loaded",
+      className: "border-amber-400/40 bg-amber-500/10 text-amber-200",
+    };
+  }, [isModelReady, isPreparingModel]);
+
   const canExtract = useMemo(() => {
     if (isExtracting || isPreparingModel) {
       return false;
@@ -265,6 +293,11 @@ export default function GlinerExtractorPage() {
             <p className="mt-1 text-sm text-slate-300">
               Current mode: <span className="font-semibold text-emerald-200">{modeLabel(mode)}</span>
             </p>
+            <div className="mt-2">
+              <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${modelStatusMeta.className}`}>
+                {modelStatusMeta.label}
+              </span>
+            </div>
           </header>
 
           <div className="flex flex-wrap gap-2">
@@ -396,6 +429,9 @@ export default function GlinerExtractorPage() {
                   ? "Grouped entities are shown first for business use, followed by raw entities for debugging."
                   : "Custom extraction entities are shown below."}
               </p>
+              <p className="mt-2 text-xs text-slate-400">
+                Latest result: <span className="font-semibold text-slate-200">{extractedEntityCount}</span> entit{extractedEntityCount === 1 ? "y" : "ies"}.
+              </p>
             </div>
             <button
               type="button"
@@ -410,7 +446,7 @@ export default function GlinerExtractorPage() {
               }}
               className="rounded border border-emerald-300/40 bg-emerald-500/10 px-3 py-1.5 text-xs font-medium text-emerald-100 transition hover:bg-emerald-500/20 disabled:cursor-not-allowed disabled:border-slate-600 disabled:bg-slate-800 disabled:text-slate-400"
             >
-              Download JSON
+              {downloadableResult ? "Download JSON" : "No Data to Download"}
             </button>
           </header>
 
