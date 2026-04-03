@@ -7,7 +7,6 @@ const navItems = [
   { path: "/har-analyzer", label: "HAR Analyzer" },
   { path: "/json-formatter", label: "JSON Formatter" },
   { path: "/gst-calculator", label: "GST Tool" },
-  { path: "/prompt-perfection-engine", label: "Prompt Engine" },
   { path: "/about", label: "About" },
   { path: "/contact", label: "Contact" },
   { path: "/privacy", label: "Privacy" },

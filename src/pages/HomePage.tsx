@@ -6,29 +6,25 @@ import { setSEO } from "../utils/seo";
 
 const toolCards = [
   {
-    title: "Prompt Perfection Engine",
-    description:
-      "Optimize your AI prompts for clarity, structure, and maximum output quality using advanced prompt analysis.",
-    path: "/prompt-perfection-engine",
-    featured: true, // 👈 highlight trigger
-  },
-  {
     title: "HAR Analyzer",
     description:
       "Spot slow endpoints, broken APIs, and status-code spikes from real browser captures instead of guessing from logs.",
     path: "/har-analyzer",
+    isNew: true,
   },
   {
     title: "JSON Formatter",
     description:
       "Clean unreadable payloads, validate quickly, and catch syntax mistakes before your API call fails in production.",
     path: "/json-formatter",
+    isNew: true,
   },
   {
     title: "GST Calculator",
     description:
       "Understand inclusive vs exclusive pricing so you stop quoting totals that quietly hurt your margins.",
     path: "/gst-calculator",
+    isNew: false,
   },
 ];
 
@@ -59,17 +55,9 @@ function HomePage() {
         className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
       >
         {toolCards.map((tool) => (
-          <Card
-            key={tool.path}
-            hoverable
-            className={
-              tool.featured
-                ? "relative border-emerald-400/40 bg-emerald-500/10 shadow-[0_0_0_1px_rgba(16,185,129,0.25)]"
-                : ""
-            }
-          >
-            {/* NEW badge */}
-            {tool.featured && (
+          <Card key={tool.path} hoverable>
+            {/* NEW badge (optional) */}
+            {tool.isNew && (
               <span className="absolute top-3 right-3 text-xs bg-emerald-400 text-black px-2 py-1 rounded-full font-semibold">
                 NEW
               </span>
@@ -78,7 +66,6 @@ function HomePage() {
             {/* Title */}
             <h2 className="text-lg font-semibold text-[var(--text-strong)]">
               {tool.title}
-              {tool.featured}
             </h2>
 
             {/* Description */}
@@ -91,7 +78,7 @@ function HomePage() {
               to={tool.path}
               className="mt-4 inline-flex rounded-xl border border-emerald-300/30 bg-emerald-500/12 px-3 py-2 text-sm font-medium text-emerald-100 transition-all duration-200 ease-in-out hover:scale-[1.02] hover:border-emerald-200/45 hover:bg-emerald-400/18 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/45"
             >
-              {tool.featured ? "Try it now →" : "Open tool"}
+              Open Tool →
             </Link>
           </Card>
         ))}
